@@ -1,6 +1,6 @@
-import DashboardLayout from "@/components/layouts/dashboard-layout";
-import { Button } from "@/components/ui/button";
-import { Head, router } from "@inertiajs/react";
+import DashboardLayout from '@/components/layouts/dashboard-layout';
+import { Button } from '@/components/ui/button';
+import { Head, router } from '@inertiajs/react';
 
 export default function Page() {
     const handleOrder = () => {
@@ -8,17 +8,18 @@ export default function Page() {
         //
         //
 
-
         router.visit('/categories');
         // window.location.href = '/categories';
-    }
+    };
 
-  return (
-    <>
-    <Head title="Dashboard" />
-    <DashboardLayout>
-        <Button onClick={handleOrder}>Order Now</Button>
-    </DashboardLayout>
-    </>
-  )
+    console.log('test');
+
+    return (
+        <>
+            <Head title="Dashboard" />
+            <DashboardLayout>
+                <Button onClick={handleOrder}>Order Now</Button>
+            </DashboardLayout>
+        </>
+    );
 }
