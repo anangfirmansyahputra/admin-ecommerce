@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    public function authenticate(Request $request) {
+    public function authenticate(Request $request)
+    {
         $credentials = $request->validate([
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string', 'min:3', 'max:20']
@@ -24,7 +25,8 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout(Request $request) {
+    public function logout(Request $request)
+    {
         Auth::logout();
 
         $request->session()->invalidate();

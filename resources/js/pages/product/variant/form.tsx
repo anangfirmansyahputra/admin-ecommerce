@@ -39,7 +39,8 @@ export default function ProductVariantForm({ product, variant }: Props) {
 
         if (variant) {
             router.post(
-                `/dashboard/products/${product.id}/variants/${variant.id}`,
+                // `/dashboard/products/${product.id}/variants/${variant.id}`,
+                route('products.variants.update', [product.id, variant.id]),
                 {
                     ...data,
                     _method: 'put',
@@ -49,7 +50,7 @@ export default function ProductVariantForm({ product, variant }: Props) {
                 },
             );
         } else {
-            post(`/dashboard/products/${product.id}/variants`, {
+            post(route('products.variants.store', [product.id]), {
                 preserveScroll: true,
             });
         }

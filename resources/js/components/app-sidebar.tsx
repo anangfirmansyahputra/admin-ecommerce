@@ -6,7 +6,7 @@ import {
     IconFileDescription,
     IconInnerShadowTop,
     IconListDetails,
-    IconSettings
+    IconSettings,
 } from '@tabler/icons-react';
 import * as React from 'react';
 
