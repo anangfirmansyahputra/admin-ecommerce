@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
 
@@ -14,6 +15,8 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with('category')->get();
+
+        $orders = Order::with('user')->get();
 
         return inertia('product/index', compact('products'));
     }
