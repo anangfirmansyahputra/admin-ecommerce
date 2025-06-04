@@ -26,6 +26,6 @@ jobs:
     - name: FTP-Deploy-Action
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
       with:
-        server: ${{ secrets.SERVER }}
+        server: ftp.fullstressdigital.id
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }}
