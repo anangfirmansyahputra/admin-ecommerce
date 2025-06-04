@@ -118,7 +118,7 @@ export default function ProductVariantForm({ product, variant }: Props) {
                             <div className="flex items-center gap-5 rounded-lg border p-3">
                                 <img
                                     className="aspect-square w-20 rounded object-cover"
-                                    src={`http://127.0.0.1:8000/storage/${variant.image}`}
+                                    src={`https://admin.fullstressdigital.id/storage/${variant.image}`}
                                     alt=""
                                 />
                                 <p>{variant.image.replace('product/', '')}</p>

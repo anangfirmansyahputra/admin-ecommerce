@@ -27,7 +27,7 @@ export const columns: ColumnDef<ProductVariant>[] = [
 
             return (
                 <img
-                    src={`http://127.0.0.1:8000/storage/${variant.image}`}
+                    src={`https://admin.fullstressdigital.id/storage/${variant.image}`}
                     className="aspect-square w-[100px] object-contain"
                     alt={variant.variant_name}
                 />
