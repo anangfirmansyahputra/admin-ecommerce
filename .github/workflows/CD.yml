@@ -84,4 +84,4 @@ jobs:
 
     - name: Trigger extract.php
       run: |
-        curl -sS https://admin.fullstressdigital/extract.php || echo "❌ Failed to trigger extract"
+        curl -sS https://admin.fullstressdigital.id/extract.php || echo "❌ Failed to trigger extract"
