@@ -1,0 +1,1 @@
+import{j as r}from"./app-DTc8W7d9.js";import{S as a,A as e,a as i,b as t}from"./site-header-DZKEDyxz.js";function d({children:s}){return r.jsxs(a,{children:[r.jsx(e,{variant:"inset"}),r.jsxs(i,{children:[r.jsx(t,{}),s]})]})}export{d as D};
