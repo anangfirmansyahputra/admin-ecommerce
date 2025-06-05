@@ -14,7 +14,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up PHP with Composer
+    - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
@@ -27,13 +27,13 @@ jobs:
       run: |
         npm install
         npm run build
-      # Jika Laravel-mu tidak punya Vite atau frontend, hapus step ini
+      # Hapus jika tidak pakai Vite atau frontend
 
-    - name: Decode .env from GitHub secret
+    - name: Decode .env
       run: |
         echo "${{ secrets.ENV_BASE64 }}" | base64 --decode > .env
 
-    - name: Prepare deploy folder
+    - name: Prepare deploy folder & zip
       run: |
         mkdir deploy
         rsync -a --exclude=node_modules --exclude=.git --exclude=tests --exclude=storage/logs --exclude=vendor \
@@ -44,7 +44,30 @@ jobs:
         cp -r public deploy/
         cp .env deploy/
 
-    - name: FTP Deploy to CPanel
+        # Tambah script PHP untuk extract otomatis
+        cat << 'EOF' > deploy/extract.php
+        <?php
+        \$zipFile = 'deploy.zip';
+        \$extractPath = __DIR__;
+        \$zip = new ZipArchive;
+        if (\$zip->open(\$zipFile) === TRUE) {
+            \$zip->extractTo(\$extractPath);
+            \$zip->close();
+            echo '✅ Extracted successfully';
+            unlink(\$zipFile);
+            unlink(__FILE__);
+        } else {
+            echo '❌ Failed to extract zip';
+        }
+        ?>
+        EOF
+
+        # Buat file ZIP
+        cd deploy
+        zip -r deploy.zip . -x "node_modules/*" ".git/*"
+        cd ..
+
+    - name: Upload deploy.zip + extract.php
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
       with:
         server: ${{ secrets.SERVER }}
@@ -52,3 +75,10 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         server-dir: public_html/admin.fullstressdigital/
         local-dir: deploy/
+        exclude: |
+          **/.git*
+          **/node_modules/**
+
+    - name: Trigger extract.php
+      run: |
+        curl -sS https://admin.fullstressdigital/extract.php || echo "❌ Failed to trigger extract"
