@@ -36,12 +36,17 @@ jobs:
         cp -r storage build/
         cp -r bootstrap build/
         cp -r public build/
-        cp .env build/
+        if [ -f .env ]; then cp .env build/; else echo ".env file not found, skipping"; fi
 
-        # Buat ZIP dari folder build/
+        echo "Files in build:"
+        ls -la build/
+
         cd build
-        zip -r ../deploy.zip . -x "node_modules/*" ".git/*"
+        zip -r ../deploy.zip . -x "node_modules/*" ".git/*" -v
         cd ..
+
+        echo "Files in root:"
+        ls -la deploy.zip
 
     - name: Upload deploy.zip via FTP
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
