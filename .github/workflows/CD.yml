@@ -29,6 +29,10 @@ jobs:
         npm run build
       # Jika Laravel-mu tidak punya Vite atau frontend, hapus step ini
 
+    - name: Decode .env from GitHub secret
+      run: |
+        echo "${{ secrets.ENV_BASE64 }}" | base64 --decode > .env
+
     - name: Prepare deploy folder
       run: |
         mkdir deploy
