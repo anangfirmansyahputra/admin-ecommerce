@@ -1,0 +1,50 @@
+name: Deploy Laravel to cPanel
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy via FTP
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up PHP with Composer
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        tools: composer
+
+    - name: Install Composer dependencies
+      run: composer install --no-dev --optimize-autoloader --prefer-dist
+
+    - name: Build frontend (optional)
+      run: |
+        npm install
+        npm run build
+      # Jika Laravel-mu tidak punya Vite atau frontend, hapus step ini
+
+    - name: Prepare deploy folder
+      run: |
+        mkdir deploy
+        rsync -a --exclude=node_modules --exclude=.git --exclude=tests --exclude=storage/logs --exclude=vendor \
+          ./ deploy/
+        cp -r vendor deploy/
+        cp -r storage deploy/
+        cp -r bootstrap deploy/
+        cp -r public deploy/
+        cp .env deploy/
+
+    - name: FTP Deploy to CPanel
+      uses: SamKirkland/FTP-Deploy-Action@4.3.3
+      with:
+        server: ${{ secrets.SERVER }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        server-dir: public_html/admin.fullstressdigital/
+        local-dir: deploy/
