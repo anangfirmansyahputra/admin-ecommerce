@@ -24,6 +24,10 @@ jobs:
     - name: Install PHP dependencies
       run: composer install --no-dev --optimize-autoloader
 
+    - name: Decode .env
+      run: |
+        echo "${{ secrets.ENV_BASE64 }}" | base64 --decode > .env
+
     - name: Prepare deploy.zip
       run: |
         mkdir build
