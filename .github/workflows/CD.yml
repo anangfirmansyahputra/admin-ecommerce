@@ -33,19 +33,19 @@ jobs:
       run: |
         echo "${{ secrets.ENV_BASE64 }}" | base64 --decode > .env
 
-    - name: Prepare deploy folder & zip
+    - name: Prepare deploy.zip + extract.php
       run: |
-        mkdir deploy
+        mkdir build
         rsync -a --exclude=node_modules --exclude=.git --exclude=tests --exclude=storage/logs --exclude=vendor \
-          ./ deploy/
-        cp -r vendor deploy/
-        cp -r storage deploy/
-        cp -r bootstrap deploy/
-        cp -r public deploy/
-        cp .env deploy/
+          ./ build/
+        cp -r vendor build/
+        cp -r storage build/
+        cp -r bootstrap build/
+        cp -r public build/
+        cp .env build/
 
-        # Tambah script PHP untuk extract otomatis
-        cat << 'EOF' > deploy/extract.php
+        # Tambah script extract.php ke root (bukan di dalam build/)
+        cat << 'EOF' > extract.php
         <?php
         \$zipFile = 'deploy.zip';
         \$extractPath = __DIR__;
@@ -62,22 +62,25 @@ jobs:
         ?>
         EOF
 
-        # Buat file ZIP
-        cd deploy
-        zip -r deploy.zip . -x "node_modules/*" ".git/*"
+        # Buat ZIP dari folder build/
+        cd build
+        zip -r ../deploy.zip . -x "node_modules/*" ".git/*"
         cd ..
 
-    - name: Upload deploy.zip + extract.php
+    - name: Upload only deploy.zip + extract.php
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
       with:
         server: ${{ secrets.SERVER }}
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }}
         server-dir: public_html/admin.fullstressdigital/
-        local-dir: deploy/
+        local-dir: ./
         exclude: |
-          **/.git*
-          **/node_modules/**
+          *
+        include: |
+          deploy.zip
+          extract.php
+
 
     - name: Trigger extract.php
       run: |
