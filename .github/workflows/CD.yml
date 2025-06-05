@@ -1,87 +1,51 @@
-name: Deploy Laravel to cPanel
-
+name: Publish Website to CPanel
 on:
   push:
     branches:
       - main
-
 jobs:
-  deploy:
-    name: Deploy via FTP
+  FTP-Deploy-Action:
+    name: FTP-Deploy-Action
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v2.1.0
+      with:
+        fetch-depth: 2
 
-    - name: Setup PHP
+    - name: Build assets
+      run: npm install && npm run build
+
+    - name: Install PHP and Composer
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.2'
-        tools: composer
+        tools: 'composer'
 
-    - name: Install Composer dependencies
-      run: composer install --no-dev --optimize-autoloader --prefer-dist
+    - name: Install PHP dependencies
+      run: composer install --no-dev --optimize-autoloader
 
-    - name: Build frontend (optional)
-      run: |
-        npm install
-        npm run build
-      # Hapus jika tidak pakai Vite atau frontend
-
-    - name: Decode .env
-      run: |
-        echo "${{ secrets.ENV_BASE64 }}" | base64 --decode > .env
-
-    - name: Prepare deploy.zip + extract.php
+    - name: Prepare deploy.zip
       run: |
         mkdir build
-        rsync -a --exclude=node_modules --exclude=.git --exclude=tests --exclude=storage/logs --exclude=vendor \
-          ./ build/
+        rsync -a --exclude=node_modules --exclude=.git --exclude=tests --exclude=storage/logs --exclude=vendor ./ build/
         cp -r vendor build/
         cp -r storage build/
         cp -r bootstrap build/
         cp -r public build/
         cp .env build/
 
-        # Tambah script extract.php ke root (bukan di dalam build/)
-        cat << 'EOF' > extract.php
-        <?php
-        \$zipFile = 'deploy.zip';
-        \$extractPath = __DIR__;
-        \$zip = new ZipArchive;
-        if (\$zip->open(\$zipFile) === TRUE) {
-            \$zip->extractTo(\$extractPath);
-            \$zip->close();
-            echo '✅ Extracted successfully';
-            unlink(\$zipFile);
-            unlink(__FILE__);
-        } else {
-            echo '❌ Failed to extract zip';
-        }
-        ?>
-        EOF
-
         # Buat ZIP dari folder build/
         cd build
         zip -r ../deploy.zip . -x "node_modules/*" ".git/*"
         cd ..
 
-    - name: Upload only deploy.zip + extract.php
+    - name: Upload deploy.zip via FTP
       uses: SamKirkland/FTP-Deploy-Action@4.3.3
       with:
         server: ${{ secrets.SERVER }}
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }}
-        server-dir: public_html/admin.fullstressdigital/
-        local-dir: ./
         exclude: |
           *
         include: |
           deploy.zip
-          extract.php
-
-
-    - name: Trigger extract.php
-      run: |
-        curl -sS https://admin.fullstressdigital.id/extract.php || echo "❌ Failed to trigger extract"
