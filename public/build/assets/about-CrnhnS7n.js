@@ -1,0 +1,1 @@
+import{j as e}from"./app--_CPEeYz.js";import"./app-Brn6tO4v.js";function s(){return e.jsx("div",{className:"flex items-center justify-center h-screen",children:e.jsx("h1",{className:"text-red-500",children:"AboutPage"})})}export{s as default};
